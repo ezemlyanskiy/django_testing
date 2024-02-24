@@ -10,14 +10,14 @@ from pytest_django.asserts import assertRedirects
     'name, args',
     (
         ('news:home', None),
-        ('news:detail', pytest.lazy_fixture('news_pk')),
+        ('news:detail', pytest.lazy_fixture('news')),
         ('users:login', None),
         ('users:logout', None),
         ('users:signup', None),
     ),
 )
 def test_pages_availability(client, name, args):
-    url = reverse(name, args=args)
+    url = reverse(name, args=args if not args else (args.pk,))
     response = client.get(url)
     assert response.status_code == HTTPStatus.OK
 
@@ -34,9 +34,9 @@ def test_pages_availability(client, name, args):
     ),
 )
 def test_availability_for_comment_edit_and_delete(
-    name, parametrized_client, comment_pk, status
+    name, parametrized_client, comment, status
 ):
-    url = reverse(name, args=comment_pk)
+    url = reverse(name, args=(comment.pk,))
     response = parametrized_client.get(url)
     assert response.status_code == status
 
@@ -45,9 +45,9 @@ def test_availability_for_comment_edit_and_delete(
     'name',
     ('news:edit', 'news:delete'),
 )
-def test_redirect_for_anonymous_client(client, comment_pk, name):
+def test_redirect_for_anonymous_client(client, comment, name):
     login_url = reverse('users:login')
-    url = reverse(name, args=comment_pk)
+    url = reverse(name, args=(comment.pk,))
     redirect_url = f'{login_url}?next={url}'
     response = client.get(url)
     assertRedirects(response, redirect_url)

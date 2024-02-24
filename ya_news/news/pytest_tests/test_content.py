@@ -26,8 +26,8 @@ def test_news_order(client):
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures('comments_data')
-def test_comments_order(client, news_pk):
-    response = client.get(reverse('news:detail', args=news_pk))
+def test_comments_order(client, news):
+    response = client.get(reverse('news:detail', args=(news.pk,)))
     assert 'news' in response.context
     news = response.context['news']
     all_comments = news.comment_set.all()
@@ -45,8 +45,8 @@ def test_comments_order(client, news_pk):
     ),
 )
 def test_form_for_auth_and_anonymous_users(
-    parametrized_client, form_in_context, is_instance, news_pk
+    parametrized_client, form_in_context, is_instance, news
 ):
-    response = parametrized_client.get(reverse('news:detail', args=news_pk))
+    response = parametrized_client.get(reverse('news:detail', args=(news.pk,)))
     assert ('form' in response.context) is form_in_context
     assert isinstance(response.context.get('form'), CommentForm) is is_instance

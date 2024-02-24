@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import pytest
 from django.conf import settings
@@ -47,28 +47,16 @@ def comment(author, news):
 
 
 @pytest.fixture
-def news_pk(news):
-    return (news.pk,)
-
-
-@pytest.fixture
-def comment_pk(comment):
-    return (comment.pk,)
-
-
-@pytest.fixture
 def news_data():
-    today = datetime.today()
+    now = timezone.now()
     News.objects.bulk_create(
         News(
             title=f'News {index}',
             text='Just text.',
-            date=today - timedelta(index),
+            date=(now + timedelta(days=index)).date(),
         )
         for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
     )
-    yield
-    News.objects.all().delete()
 
 
 @pytest.fixture
@@ -82,12 +70,3 @@ def comments_data(news, author):
         )
         comment.created = now + timedelta(days=index)
         comment.save()
-    yield
-    Comment.objects.all().delete()
-
-
-@pytest.fixture
-def form_data():
-    return {
-        'text': 'Comment text',
-    }
