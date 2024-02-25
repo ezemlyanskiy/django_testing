@@ -45,7 +45,7 @@ def test_comments_order(client, news):
     ),
 )
 def test_form_for_auth_and_anonymous_users(
-    parametrized_client, form_in_context, is_instance, news
+    news, parametrized_client, form_in_context, is_instance
 ):
     response = parametrized_client.get(reverse('news:detail', args=(news.pk,)))
     assert ('form' in response.context) is form_in_context

@@ -53,7 +53,7 @@ def news_data():
         News(
             title=f'News {index}',
             text='Just text.',
-            date=(now + timedelta(days=index)).date(),
+            date=now.date() + timedelta(days=index),
         )
         for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
     )
@@ -70,3 +70,8 @@ def comments_data(news, author):
         )
         comment.created = now + timedelta(days=index)
         comment.save()
+
+
+@pytest.fixture
+def comments_count():
+    return Comment.objects.count()
